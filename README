@@ -1,30 +1,21 @@
 LIBICC++
 
-The purpose of this library is provide a type safe way to load and apply ICC profiles.
-Currently it handles Lut16Type, Lut8Type, LutAtoBType and LutBtoAType, does not handles
-multi stage processing elements.
+The purpose of this library is provide a type safe way to load and apply ICC profiles. Currently it handles Lut16Type, Lut8Type, LutAtoBType and LutBtoAType, does not handles multi stage processing elements.
 
 How it works
 
-The basic idea of the library is build a template function_t<Y, X> having a member function_t
-eval(const X &) returning an Y. These templates can be composed in a type safe manner, so given
-a function_t<Y, X> and a function_t<X, Z> they can be composed info a function_t<Y, Z>
-The library defines a few standard color spaces, like XYZ, Lab, RGB
+The basic idea of the library is build a template function_t<Y, X> having a member function_t eval(const X &) returning an Y. These templates can be composed in a type safe manner, so given a function_t<Y, X> and a function_t<X, Z> they can be composed info a function_t<Y, Z>. The library defines a few standard color spaces, like XYZ, Lab, RGB
 
-Said that a profile can be represented as a function_t<rgb_t, xyz_t> mapping a value in the
-profile connection space (xyz_t) to a device space (rgb_t). To load a profile one can use the
-following code:
+
+Said that a profile can be represented as a function_t<rgb_t, xyz_t> mapping a value in the profile connection space (xyz_t) to a device space (rgb_t). To load a profile one can use the following code:
 
 	std::unique_ptr<profile_t> handler(profile_t::create("profile.icc"));
     function_t<rgb_t<double>, lab_t> f = handler->pcs2device<rgb_t<double>, lab_t>();
 
-The library will load the profile and generate a function of the proper type when requested
-(member pcd2device). If, in a situation like the one above, the PCS is XYZ then the library 
-will add a XYZ->Lab conversion. This is very handy, especially if one needs a function returning
-rgb_t<unsigned char> instead of rgb_t<double>.
+The library will load the profile and generate a function of the proper type when requested (member pcd2device). If, in a situation like the one above, the PCS is XYZ then the library will add a XYZ->Lab conversion. This is very handy, especially if one needs a function returning rgb_t<unsigned char> instead of rgb_t<double>.
 
-In general one has to state the types wanted for the transform, then the library will try to 
-build one given the 'bricks' available. To build a colour transform there is a similar way:
+
+In general one has to state the types wanted for the transform, then the library will try to build one given the 'bricks' available. To build a colour transform there is a similar way:
 
 	std::unique_ptr<profile_t> input(profile_t::create_srgb());
 	std::unique_ptr<profile_t> output(profile_t::create("profile.icc"));
@@ -37,11 +28,8 @@ build one given the 'bricks' available. To build a colour transform there is a s
 A final note.
 The development of the library is at an early stage, but has, in my opinion, a few interesting features:
 1. Template base tetrahedral interpolation working for inputs up to dimension 15.
-2. Possibility to speed up computations by taking a generic function_t<Y, X> and build 
-   a N-Dimensional lookup table filled in with the values taken from the function.
-   This may reduce precision but can give  significant speed up. 
+2. Possibility to speed up computations by taking a generic function_t<Y, X> and build  a N-Dimensional lookup table filled in with the values taken from the function. This may reduce precision but can give  significant speed up. 
    
 Compilers
-   The code has been tested with MSVC13 and MingW
-
+   The code has been tested with MSVC13 on Windows, and with Clang 3.5 on Linux
 											 

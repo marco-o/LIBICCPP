@@ -197,7 +197,7 @@ namespace iccpp
 			// TODO add clipping  [0,1] range
 			vector_t<double, Outputs> result;
 			for (int i = 0; i < Outputs; i++)
-				result[i] = arithmetic_t<double, Inputs>::dot(x.data(), matrix_[Outputs]);
+				result[i] = arithmetic_t<double, Inputs>::dot(x.data(), matrix_[i]);
 			LOG_PIXEL(__FUNCTION__, result);
 			return result;
 		}

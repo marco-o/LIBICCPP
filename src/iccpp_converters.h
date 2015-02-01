@@ -192,7 +192,7 @@ namespace iccpp
             algo_t<Y, D> *algo = dynamic_cast<algo_t<Y, D> *>(&algod);
             if (algo != 0)
                 result_ = domain_converter_t<Y, D, Z>::adapt(
-                reinterpret_cast<typename color_conversion_t<D, Z>::domain_t *>(nullptr), algo);
+                reinterpret_cast<typename color_conversion_t<D, Z>::domain_t *>(0), algo);
         }
         algo_base_t *result_;
     };
@@ -221,7 +221,7 @@ namespace iccpp
             algo_t<R, X> *algo = dynamic_cast<algo_t<R, X> *>(&algod);
             if (algo != 0)
                 result_ = range_converter_t<Y, R, X>::adapt(
-                reinterpret_cast<typename color_conversion_t<Y, R>::domain_t *>(nullptr), algo);
+                reinterpret_cast<typename color_conversion_t<Y, R>::domain_t *>(0), algo);
         }
         algo_base_t *result_;
     };

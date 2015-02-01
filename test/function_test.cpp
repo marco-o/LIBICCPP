@@ -20,7 +20,6 @@
 #include "test_registrar.h"
 #endif
 
-#include <boost/lexical_cast.hpp>
 #include <iostream>
 
 #include "iccpp_image.h"
@@ -30,6 +29,7 @@
 #include "iccpp_clut.h"
 #include "iccpp_color_spaces.h"
 
+#ifdef HAVE_BOOST
 namespace iccpp
 {
 	template <class X>
@@ -53,6 +53,7 @@ namespace iccpp
 		}
 	};
 }
+#endif
 
 using namespace iccpp;
 // ==============================================================================
@@ -66,14 +67,15 @@ BOOST_AUTO_TEST_CASE(function_identity_eval) {
 	BOOST_CHECK(1 == funct(1));
 }
 
+#ifdef HAVE_BOOST
 BOOST_AUTO_TEST_CASE(function_compose_eval) 
 {
 	iccpp::function_t<std::string, int>  f1(new iccpp::cast_text_t<int>);
 	iccpp::function_t<int, std::string>  f2(new iccpp::text_uncast_t<int>);
 	iccpp::function_t<int, int> f = f2 * f1;
 	BOOST_CHECK(1 == f(1));
-
 }
+#endif
 
 BOOST_AUTO_TEST_CASE(image_compile)
 {

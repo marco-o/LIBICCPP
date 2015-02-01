@@ -344,7 +344,7 @@ namespace iccpp
 			domain_space_t(void) : result_(0) {}
 			algo_base_t *result(algo_base_t *algo)
 			{
-				return (result_ == 0 ? algo : result);
+				return (result_ == 0 ? algo : result_);
 			}
 			virtual void visit_domain(algo_domain_t<vector_t<double, N>> &algo) override
 			{  // which is the range of algo? Do I care of it?
@@ -386,7 +386,7 @@ namespace iccpp
             static tag_content_ptr_t lut_loaderI(S &s, int inputs, reader_t &reader)
             {
                 if (inputs == N)
-                    return s.lut_loaderI<Tag, N>(reader);
+                    return s.template lut_loaderI<Tag, N>(reader);
                 else
                     return switch_unroller_t<S, N + 1, M>::template lut_loaderI<Tag>(s, inputs, reader);
             }
@@ -394,7 +394,7 @@ namespace iccpp
             static tag_content_ptr_t lut_loaderIO(S &s, int outputs, reader_t &reader)
             {
                 if (outputs == N)
-                    return s.lut_loaderIO<I, N>(Tag(), reader);
+                    return s.template lut_loaderIO<I, N>(Tag(), reader);
                 else
                     return switch_unroller_t<S, N + 1, M>::template lut_loaderIO<Tag, I>(s, outputs, reader);
             }
@@ -601,7 +601,7 @@ namespace iccpp
             tag_content_ptr_t lut_loaderI(reader_t &reader)
 			{
                 auto outputs = reader.read<typename io_size_trait_t<Tag>::type>();
-                return switch_unroll_t<profile_imp_t>::lut_loaderIO<Tag, Inputs>(*this, outputs, reader);
+                return switch_unroll_t<profile_imp_t>::template lut_loaderIO<Tag, Inputs>(*this, outputs, reader);
 			}
             /*
 			template <int Outputs, int Inputs>

@@ -21,6 +21,8 @@ BOOST_AUTO_TEST_CASE(icc_loader)
 	std::unique_ptr<profile_t> handler(profile_t::create("profile.icc"));
     std::unique_ptr<profile_t> handler1(profile_t::create_sRGB());
 	BOOST_CHECK(handler);
+    if (!handler)
+        return ;
 	handler->list_tags(std::cout);
 	handler->load_tag(tag_signature_t::BToA1Tag);
 //	handler->load_all();

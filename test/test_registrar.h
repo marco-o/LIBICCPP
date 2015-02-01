@@ -39,8 +39,8 @@ namespace test
         }
         static bool get(const std::string &key, F &f)
         {
-            entries_vect_t::iterator it = std::find_if(entries().begin(), entries().end(),
-                [&key](entry_t &entry){ return entry.first == key; });
+            auto it = std::find_if(entries().begin(), entries().end(),
+                            [&key](entry_t &entry){ return entry.first == key; });
             if (it == entries().end())
                 return false;
             f = it->second;
