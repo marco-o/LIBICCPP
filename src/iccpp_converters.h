@@ -1,6 +1,6 @@
 #ifndef icpp_converters_H
 #define icpp_converters_H
-//---------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //
 //  LIBICC++  
 //  Copyright Marco Oman 2015
@@ -27,25 +27,25 @@ namespace iccpp
               (there is a template specializaion for that case)
      */
     template <class Y, class X, class Z>
-	struct domain_converter_t
-	{
-		static algo_t<Y, Z> *adapt(Z *, const algo_t<Y, X> *f1)
-		{
+    struct domain_converter_t
+    {
+        static algo_t<Y, Z> *adapt(Z *, const algo_t<Y, X> *f1)
+        {
             return new typename function_t<Y, X>::template composite_t<Z>(f1->clone(), new color_conversion_t<X, Z>);
-		}
+        }
         static algo_t<Y, Z> *adapt(domain_null_t *, const algo_t<Y, X> *)
         {
             return nullptr;
         }
     };
 
-	template <class Y, class X>
-	struct domain_converter_t<Y, X, X>
-	{
+    template <class Y, class X>
+    struct domain_converter_t<Y, X, X>
+    {
         static algo_t<Y, X> *adapt(X *, const algo_t<Y, X> *f)
-		{
-			return f->clone();
-		}
+        {
+            return f->clone();
+        }
         static algo_t<Y, X> *adapt(domain_null_t *, const algo_t<Y, X> *f)
         {
             return f->clone();
@@ -58,26 +58,26 @@ namespace iccpp
             If there is no such conversion nullptr is returned.
     */
     template <class Y, class X, class Z>
-	struct range_converter_t
-	{
-		static algo_t<Y, Z> *adapt(X *, const algo_t<X, Z> *f1)
-		{
+    struct range_converter_t
+    {
+        static algo_t<Y, Z> *adapt(X *, const algo_t<X, Z> *f1)
+        {
             return new typename function_t<Y, X>::template composite_t<Z>(new color_conversion_t<Y, X>, f1->clone());
-		}
+        }
         static algo_t<Y, Z> *adapt(domain_null_t *, const algo_t<X, Z> *)
         {
             return nullptr;
         }
-	};
+    };
 
 
-	template <class Y, class X>
-	struct range_converter_t<Y, Y, X>
-	{
+    template <class Y, class X>
+    struct range_converter_t<Y, Y, X>
+    {
         static algo_t<Y, X> *adapt(Y *, const algo_t<Y, X> *f)
-		{
-			return f->clone();
-		}
+        {
+            return f->clone();
+        }
         static algo_t<Y, X> *adapt(domain_null_t *, const algo_t<Y, X> *f)
         {
             return f->clone();

@@ -1,6 +1,6 @@
 #ifndef iccpp_profile_H
 #define iccpp_profile_H
-//---------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //
 //  LIBICC++  
 //  Copyright Marco Oman 2015
@@ -37,32 +37,32 @@
 
 namespace iccpp
 {
-	///
-	/// @class icc_file_exception_t
-	/// @brief Exception thrown in case of any problem encountered while loading a profile
-	///
-	class icc_file_exception_t : public std::runtime_error
-	{ 
-	public:
-		icc_file_exception_t(const char *msg) : std::runtime_error(msg) {}
-	};
+    ///
+    /// @class icc_file_exception_t
+    /// @brief Exception thrown in case of any problem encountered while loading a profile
+    ///
+    class icc_file_exception_t : public std::runtime_error
+    { 
+    public:
+        icc_file_exception_t(const char *msg) : std::runtime_error(msg) {}
+    };
 
-	///
-	/// @class profile_t
-	/// @brief This is the class that defines the interface for profile loading
-	///
-	class profile_t
-	{
-	public:
-		static profile_t *create_sRGB(void); ///< Construction of a standard case
-		static profile_t *create(const char *); ///< Constructor from file path
-		static profile_t *create(std::unique_ptr<std::ifstream> &); ///< Constructor from file path
-		virtual ~profile_t(void) {}
-		virtual color_space_t pcs(void) const = 0;
-		virtual color_space_t device(void) const = 0;
-		virtual void list_tags(std::ostream &) const {}
-		virtual void load_all(void) {}
-		virtual void load_tag(tag_signature_t) {}
+    ///
+    /// @class profile_t
+    /// @brief This is the class that defines the interface for profile loading
+    ///
+    class profile_t
+    {
+    public:
+        static profile_t *create_sRGB(void); ///< Construction of a standard case
+        static profile_t *create(const char *); ///< Constructor from file path
+        static profile_t *create(std::unique_ptr<std::ifstream> &); ///< Constructor from file path
+        virtual ~profile_t(void) {}
+        virtual color_space_t pcs(void) const = 0;
+        virtual color_space_t device(void) const = 0;
+        virtual void list_tags(std::ostream &) const {}
+        virtual void load_all(void) {}
+        virtual void load_tag(tag_signature_t) {}
         template <class Y, class X>
         static function_t<Y, X> extract_casted(algo_base_t *algo)
         {
@@ -71,10 +71,10 @@ namespace iccpp
                 delete algo;
             return function_t<Y, X>(result);
         }
-		template <class Y, class X>
+        template <class Y, class X>
         function_t<Y, X> pcs2device(rendering_intent_t intent = rendering_intent_t::relative_colorimetric)
-		{
-			algo_base_t *algo = pcs2dev(intent);
+        {
+            algo_base_t *algo = pcs2dev(intent);
             if (algo)
             {
                 std::unique_ptr<algo_base_t> domain_adapted(adapt_domain<X>(algo)); // domain is known
@@ -83,9 +83,9 @@ namespace iccpp
             }
             return function_t<Y, X>(dynamic_cast<algo_t<Y, X> *>(algo));
         }
-		template <class Y, class X>
+        template <class Y, class X>
         function_t<Y, X> device2pcs(rendering_intent_t intent = rendering_intent_t::relative_colorimetric)
-		{
+        {
             algo_base_t *algo = dev2pcs(intent);
             if (algo)
             {
@@ -95,10 +95,10 @@ namespace iccpp
             }
             return function_t<Y, X>(dynamic_cast<algo_t<Y, X> *>(algo));
         }
-	protected:
+    protected:
         virtual algo_base_t *dev2pcs(rendering_intent_t) = 0; ///< helps building PCS to device transform
         virtual algo_base_t *pcs2dev(rendering_intent_t) = 0;
-	private:
-	};
+    private:
+    };
 }
 #endif
