@@ -23,10 +23,10 @@
 #include "iccpp_typelist.h"
 
 
-namespace iccpp
-{
-}
+/**	@file: sepration_test.cpp
 
+    @brief Functions that adds domain adptation and range adaptation
+*/
 using namespace iccpp;
 
 BOOST_AUTO_TEST_CASE(color_conv_adapter)
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(color_conv_adapter)
     BOOST_CHECK(algo5.get() != nullptr);
 }
 
-
+/// @brief Test of transform_t::create function
 BOOST_AUTO_TEST_CASE(middle_adapter)
 {
     function_t<rgb_t<double>, xyz_t> output(new xyz2rgb_t);

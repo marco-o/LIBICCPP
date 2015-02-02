@@ -9,6 +9,11 @@
 //
 #include "iccpp_profile.h"
 
+/**	@file: profiles_test.cpp
+
+    @brief Testing of functions that load a profile
+*/
+
 #ifdef HAVE_BOOST_TEST
 #include <boost/test/auto_unit_test.hpp>
 #else
@@ -49,6 +54,7 @@ BOOST_AUTO_TEST_CASE(icc_loader)
     (void)yc; 
 }
 
+/// @brief test of the sRGB built-in profile
 BOOST_AUTO_TEST_CASE(icc_srgb)
 {
 	std::unique_ptr<profile_t> handler(profile_t::create_sRGB());

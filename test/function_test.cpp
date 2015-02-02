@@ -10,7 +10,7 @@
 
 /**	@file: function_test.cpp
 
-@brief Basic function composition test.
+    @brief Basic function composition test with some simple concrete functions
 */
 
 #ifdef HAVE_BOOST_TEST
@@ -29,59 +29,24 @@
 #include "iccpp_clut.h"
 #include "iccpp_color_spaces.h"
 
-#ifdef HAVE_BOOST
-namespace iccpp
-{
-    template <class X>
-    class cast_text_t : public algo_t<std::string, X>
-    {
-    public:
-        virtual cast_text_t<X> *clone(void) const override { return new cast_text_t<X>; }
-        virtual std::string eval(const int &x) const override
-        {
-            return boost::lexical_cast<std::string>(x);
-        }
-    };
-    template <class X>
-    class text_uncast_t : public algo_t<X, std::string>
-    {
-    public:
-        virtual text_uncast_t<X> *clone(void) const override { return new text_uncast_t<X>; }
-        virtual X eval(const std::string &x) const override
-        {
-            return boost::lexical_cast<X>(x);
-        }
-    };
-}
-#endif
 
 using namespace iccpp;
-// ==============================================================================
-// Function Composition Test Cases
-// ==============================================================================
+
+
 #pragma region real_cases
 BOOST_AUTO_TEST_CASE(function_identity_eval) {
-    iccpp::identity_t<int> id;
+    identity_t<int> id;
     BOOST_CHECK(1 == id.eval(1));
-    iccpp::function_t<int, int> funct(new iccpp::identity_t<int>);
+    function_t<int, int> funct(new identity_t<int>);
     BOOST_CHECK(1 == funct(1));
 }
 
-#ifdef HAVE_BOOST
-BOOST_AUTO_TEST_CASE(function_compose_eval) 
-{
-    iccpp::function_t<std::string, int>  f1(new iccpp::cast_text_t<int>);
-    iccpp::function_t<int, std::string>  f2(new iccpp::text_uncast_t<int>);
-    iccpp::function_t<int, int> f = f2 * f1;
-    BOOST_CHECK(1 == f(1));
-}
-#endif
 
 BOOST_AUTO_TEST_CASE(image_compile)
 {
     unsigned char data[4] = { 0, 1, 2, 3 };
-    iccpp::point_t size = { 2, 2 };
-    iccpp::image_t<unsigned char> img(data, size);
+    point_t size = { 2, 2 };
+    image_t<unsigned char> img(data, size);
     BOOST_CHECK(img[0][0] == 0);
     BOOST_CHECK(img[0][1] == 1);
     BOOST_CHECK(img[1][0] == 2);
@@ -93,9 +58,9 @@ BOOST_AUTO_TEST_CASE(image_brighten)
 {
     using pixel_t = iccpp::rgba_t<unsigned char> ;
     pixel_t data[4] = { 0, 0, 0, 0, 64, 64, 64, 64, 2, 2, 2, 2, 3, 3, 3, 3 };
-    iccpp::point_t size = { 2, 2 };
-    iccpp::image_t<pixel_t> img(data, size);
-    iccpp::function_t<pixel_t, pixel_t>  f(new iccpp::brighten_t<pixel_t>(0.5));
+    point_t size = { 2, 2 };
+    image_t<pixel_t> img(data, size);
+    function_t<pixel_t, pixel_t>  f(new brighten_t<pixel_t>(0.5));
     img.apply(f);
     BOOST_CHECK(img[0][1].red == 128);
 }

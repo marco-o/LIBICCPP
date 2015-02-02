@@ -14,8 +14,8 @@
 
 namespace iccpp
 {
-    /*
-     * Turn a given function into an equivalent one based on a lookup table
+    /**
+     *  @brief Turn a given function into an equivalent one based on a lookup table
      */
     template <class Y, class X, class I = interp_tetra_t>
     function_t<Y, X> make_lut(const function_t<Y, X> &f, const size_t *steps, const X &step)
