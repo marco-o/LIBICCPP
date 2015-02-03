@@ -13,6 +13,7 @@
 #include "iccpp_function.h"
 #include "iccpp_pixel.h"
 #include "iccpp_traits.h"
+#include "iccpp_rgb.h"
 #include <math.h>
 
 //

@@ -21,9 +21,6 @@
     <ClInclude Include="..\src\iccpp_pixel.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\iccpp_utils.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\iccpp_color_spaces.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -63,6 +60,15 @@
     <ClInclude Include="..\src\iccpp_config.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\iccpp_rgb.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iccpp_rgb_traits.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iccpp_pixel_traits.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test\function_test.cpp">
@@ -81,6 +87,9 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="..\test\separation_test.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\iccpp_lut_rgb_test.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>

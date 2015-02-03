@@ -87,12 +87,14 @@
     <ClInclude Include="..\src\iccpp_image.h" />
     <ClInclude Include="..\src\iccpp_lut_funct.h" />
     <ClInclude Include="..\src\iccpp_pixel.h" />
+    <ClInclude Include="..\src\iccpp_pixel_traits.h" />
     <ClInclude Include="..\src\iccpp_profile.h" />
+    <ClInclude Include="..\src\iccpp_rgb.h" />
+    <ClInclude Include="..\src\iccpp_rgb_traits.h" />
     <ClInclude Include="..\src\iccpp_streamio.h" />
     <ClInclude Include="..\src\iccpp_tags.h" />
     <ClInclude Include="..\src\iccpp_traits.h" />
     <ClInclude Include="..\src\iccpp_typelist.h" />
-    <ClInclude Include="..\src\iccpp_utils.h" />
     <ClInclude Include="..\src\iccpp_clut.h" />
     <ClInclude Include="..\src\logger.h" />
     <ClInclude Include="..\test\test_registrar.h" />
@@ -101,6 +103,7 @@
     <ClCompile Include="..\src\iccpp_profile.cpp" />
     <ClCompile Include="..\test\function_test.cpp" />
     <ClCompile Include="..\test\iccpp_lut_funct_test.cpp" />
+    <ClCompile Include="..\test\iccpp_lut_rgb_test.cpp" />
     <ClCompile Include="..\test\profiles_test.cpp" />
     <ClCompile Include="..\test\separation_test.cpp" />
     <ClCompile Include="..\test\test_main.cpp" />

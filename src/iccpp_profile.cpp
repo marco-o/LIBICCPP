@@ -25,14 +25,15 @@
 #endif
 #include "iccpp_clut.h"
 #include "iccpp_curve.h"
-#include "iccpp_utils.h"
+#include "iccpp_rgb.h"
+#include "iccpp_pixel_traits.h"
 
 namespace iccpp
 {
     namespace 
     {
         //
-        // A meaprogramming helper
+        // A metaprogramming helper
         //
         template <int Outputs, int Inputs>
         struct cond_prod_t

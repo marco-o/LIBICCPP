@@ -10,7 +10,7 @@
 
 /**	@file: function_test.cpp
 
-    @brief Basic function composition test with some simple concrete functions
+@brief Basic function composition test with some simple concrete functions
 */
 
 #ifdef HAVE_BOOST_TEST
@@ -25,11 +25,38 @@
 #include "iccpp_image.h"
 #include "iccpp_function.h"
 #include "iccpp_profile.h"
-#include "iccpp_utils.h"
 #include "iccpp_clut.h"
 #include "iccpp_color_spaces.h"
 
 
+namespace iccpp
+{
+    template <class P>
+    class brighten_t : public algo_t<P, P>
+    {
+    public:
+        brighten_t(double value)
+        {
+            for (int i = 0; i < 256; i++)
+                lut_[i] = static_cast<unsigned char>(255.0 * pow(i / 255., value) + .5);
+        }
+        virtual P eval(const P &pixel) const override
+        {
+            P result(pixel);
+            result.red = lut_[pixel.red];
+            result.green = lut_[pixel.green];
+            result.blue = lut_[pixel.blue];
+            return result;
+        }
+        virtual brighten_t<P> *clone(void) const override
+        {
+            return new brighten_t(*this);
+        }
+    private:
+        unsigned char lut_[256];
+    };
+
+}
 using namespace iccpp;
 
 

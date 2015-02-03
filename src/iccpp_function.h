@@ -177,6 +177,21 @@ namespace iccpp
     private:
         std::unique_ptr<algo_t<Y, X>> imp_;
     };
+    // probably the simplest possible algorithm...
+    template <class X>
+    class identity_t : public algo_t<X, X>
+    {
+    public:
+        virtual X eval(const X &x) const override
+        {
+            return x;
+        }
+        virtual identity_t<X> *clone(void) const override
+        {
+            return new identity_t();
+        }
+    };
+
 
 }
 #endif

@@ -19,7 +19,7 @@
 #include "test_registrar.h"
 #endif
 #include "iccpp_lut_funct.h"
-#include "iccpp_utils.h"
+#include "iccpp_pixel_traits.h"
 
 using namespace iccpp;
 
@@ -108,66 +108,3 @@ BOOST_AUTO_TEST_CASE(lut_multi)
     BOOST_CHECK(test_multi_double<12>(4));
 }
 
-namespace iccpp
-{
-    template <class T>
-    struct lut_input_traits_t<rgb_t<T>>
-    {
-        typedef T scalar_type;
-        typedef typename scalar_traits_t<T>::weight_type weight_type;
-        //static const scalar_type *scalar(const rgb_t<T> &x) { return &x.red; }
-        static void split(const rgb_t<T> &x,
-                          const rgb_t<T> &step,
-                          delta_item_t<weight_type> *deltas,
-                          const size_t *size1)
-        {
-            split_0(x.red,   step.red,   deltas,     size1);
-            split_0(x.green, step.green, deltas + 1, size1 + 1);
-            split_0(x.blue,  step.blue,  deltas + 2, size1 + 2);
-        }
-        static rgb_t<T> build(const rgb_t<T> &base, const size_t *step)
-        {
-            return rgb_t<T>(static_cast<T>(base.red   * step[0]), 
-                            static_cast<T>(base.green * step[1]),
-                            static_cast<T>(base.blue  * step[2]));
-        }
-        static void split_0(T x, T step, delta_item_t<weight_type> *deltas, const size_t *size1)
-        {
-            T div = x / step;
-            deltas->offset = static_cast<size_t>(div);
-            // when this happens we are at the extreme end of a hypercube, ending
-            // up in a space not initialized. In this case the code adds an elements 
-            // with weight 0 but pointing to an unintitalized memory
-            // This is he 'teoric' code, below the one that avoids the if
-            // if (deltas->offset >= size1[0])
-            //     deltas->offset = size1[0] - 1;
-            deltas->offset -= deltas->offset / size1[0];
-           // deltas->value = x - deltas->offset * step;
-            deltas->value = x * scalar_traits_t<T>::one() / step - deltas->offset * scalar_traits_t<T>::one();
-        }
-
-    };
-
-}
-
-template <class T>
-bool test_lut_rgb(size_t steps)
-{
-    using pixel_t = rgb_t<T> ;
-    T step1 = static_cast<T>(scalar_traits_t<T>::cube_size() / (steps - 1));
-    pixel_t delta = { step1, step1, step1 };
-    size_t steps1[] = { steps, steps, steps };
-    function_t<pixel_t, pixel_t> seed(new identity_t<pixel_t>);
-    function_t<pixel_t, pixel_t> funct(make_lut<pixel_t, pixel_t, interp_tetra_t>(seed, steps1, delta));
-    pixel_t x(static_cast<T>(step1 *0.75), static_cast<T>(step1 * 1.2), static_cast<T>(step1 * 2.3));
-    pixel_t y = funct(x);
-    T diff = (x.blue - y.blue) * (x.blue - y.blue) + 
-             (x.green - y.green) * (x.green - y.green) + 
-             (x.red - y.red) * (x.red - y.red);
-    return diff < 1;
-}
-
-BOOST_AUTO_TEST_CASE(lut_rgb)
-{
-    test_lut_rgb<unsigned char>(6);
-}
