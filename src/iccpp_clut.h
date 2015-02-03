@@ -174,7 +174,6 @@ namespace iccpp
         };
     };
 
-
     template <class Y, class S, int N>
     struct voxel_sum_t
     {

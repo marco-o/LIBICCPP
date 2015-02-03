@@ -36,7 +36,7 @@ bool test_lut_rgb(size_t steps)
     T diff = (x.blue - y.blue) * (x.blue - y.blue) +
         (x.green - y.green) * (x.green - y.green) +
         (x.red - y.red) * (x.red - y.red);
-    return diff < 1;
+    return diff <= 3;
 }
 
 // (steps - 1) must divide 255
