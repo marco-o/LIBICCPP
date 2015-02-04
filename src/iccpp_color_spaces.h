@@ -161,7 +161,7 @@ namespace iccpp
                 else
                     y = (1 + a) * pow(x, 1.0 / 2.4) - a;
             }
-            return static_cast<S>(scalar_traits_t<S>::cube_size() * y);
+            return static_cast<S>(scalar_traits_t<S>::one() * y);
         }
     };
     using xyz2rgb_t = color_conversion_t<rgb_t<double>, xyz_t>;
@@ -193,7 +193,7 @@ namespace iccpp
         static double gamma(S s)
         {
             double y = 0.0;
-            double x = static_cast<double>(s) / scalar_traits_t<S>::cube_size();
+            double x = static_cast<double>(s) / scalar_traits_t<S>::one();
             if (x > 1)
                 y = 1;
             else if (x > 0)
@@ -253,7 +253,7 @@ namespace iccpp
     };
 
     /// @brief Conversion between rgb typed based on different channel type
-    /// Scaling to cube_size (255) is done for unsigned char channel
+    /// Scaling to one (255) is done for unsigned char channel
     ///
     template <class S, class T>
     class color_conversion_t<rgb_t<S>, rgb_t<T>> : public algo_t<rgb_t<S>, rgb_t<T>>
@@ -264,9 +264,9 @@ namespace iccpp
         {
             rgb_t<S> result;
 
-            result.red   = static_cast<S>(rgb.red   * scalar_traits_t<S>::cube_size() / scalar_traits_t<T>::cube_size()) ;
-            result.green = static_cast<S>(rgb.green * scalar_traits_t<S>::cube_size() / scalar_traits_t<T>::cube_size()) ;
-            result.blue  = static_cast<S>(rgb.blue  * scalar_traits_t<S>::cube_size() / scalar_traits_t<T>::cube_size()) ;
+            result.red   = static_cast<S>(rgb.red   * scalar_traits_t<S>::one() / scalar_traits_t<T>::one()) ;
+            result.green = static_cast<S>(rgb.green * scalar_traits_t<S>::one() / scalar_traits_t<T>::one()) ;
+            result.blue  = static_cast<S>(rgb.blue  * scalar_traits_t<S>::one() / scalar_traits_t<T>::one()) ;
             return result;
         }
         virtual color_conversion_t<rgb_t<S>, rgb_t<T>> *clone(void) const override
@@ -276,7 +276,7 @@ namespace iccpp
     };
 
     /// @brief Conversion between bgr typed based on different channel type
-    /// Scaling to cube_size (255) is done for unsigned char channel
+    /// Scaling to one (255) is done for unsigned char channel
     ///
     template <class S, class T>
     class color_conversion_t<bgr_t<S>, bgr_t<T>> : public algo_t<bgr_t<S>, bgr_t<T>>
@@ -287,9 +287,9 @@ namespace iccpp
         {
             bgr_t<S> result;
 
-            result.red   = static_cast<S>(bgr.red   * scalar_traits_t<S>::cube_size() / scalar_traits_t<T>::cube_size());
-            result.green = static_cast<S>(bgr.green * scalar_traits_t<S>::cube_size() / scalar_traits_t<T>::cube_size());
-            result.blue  = static_cast<S>(bgr.blue  * scalar_traits_t<S>::cube_size() / scalar_traits_t<T>::cube_size());
+            result.red   = static_cast<S>(bgr.red   * scalar_traits_t<S>::one() / scalar_traits_t<T>::one());
+            result.green = static_cast<S>(bgr.green * scalar_traits_t<S>::one() / scalar_traits_t<T>::one());
+            result.blue  = static_cast<S>(bgr.blue  * scalar_traits_t<S>::one() / scalar_traits_t<T>::one());
             return result;
         }
         virtual color_conversion_t<bgr_t<S>, bgr_t<T>> *clone(void) const override
@@ -299,7 +299,7 @@ namespace iccpp
     };
 
     /// @brief Conversion between rgb and bgr types, typed based on different channel type
-    /// Scaling to cube_size (255) is done for unsigned char channel
+    /// Scaling to one (255) is done for unsigned char channel
     ///
     template <class S, class T>
     class color_conversion_t<rgb_t<S>, bgr_t<T>> : public algo_t<rgb_t<S>, bgr_t<T>>
@@ -310,9 +310,9 @@ namespace iccpp
         {
             rgb_t<S> result;
 
-            result.red   = static_cast<S>(rgb.red   * scalar_traits_t<S>::cube_size / scalar_traits_t<T>::cube_size);
-            result.green = static_cast<S>(rgb.green * scalar_traits_t<S>::cube_size / scalar_traits_t<T>::cube_size);
-            result.blue  = static_cast<S>(rgb.blue  * scalar_traits_t<S>::cube_size / scalar_traits_t<T>::cube_size);
+            result.red   = static_cast<S>(rgb.red   * scalar_traits_t<S>::one / scalar_traits_t<T>::one);
+            result.green = static_cast<S>(rgb.green * scalar_traits_t<S>::one / scalar_traits_t<T>::one);
+            result.blue  = static_cast<S>(rgb.blue  * scalar_traits_t<S>::one / scalar_traits_t<T>::one);
             return result;
         }
         virtual color_conversion_t<rgb_t<S>, bgr_t<T>> *clone(void) const override
@@ -330,9 +330,9 @@ namespace iccpp
         {
             bgr_t<S> result;
 
-            result.red   = static_cast<S>(rgb.red   * scalar_traits_t<S>::cube_size / scalar_traits_t<T>::cube_size);
-            result.green = static_cast<S>(rgb.green * scalar_traits_t<S>::cube_size / scalar_traits_t<T>::cube_size);
-            result.blue  = static_cast<S>(rgb.blue  * scalar_traits_t<S>::cube_size / scalar_traits_t<T>::cube_size);
+            result.red   = static_cast<S>(rgb.red   * scalar_traits_t<S>::one / scalar_traits_t<T>::one);
+            result.green = static_cast<S>(rgb.green * scalar_traits_t<S>::one / scalar_traits_t<T>::one);
+            result.blue  = static_cast<S>(rgb.blue  * scalar_traits_t<S>::one / scalar_traits_t<T>::one);
             return result;
         }
         virtual color_conversion_t<bgr_t<S>, rgb_t<T>> *clone(void) const override

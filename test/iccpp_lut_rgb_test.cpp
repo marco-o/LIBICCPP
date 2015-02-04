@@ -26,7 +26,7 @@ template <class T>
 bool test_lut_rgb(size_t steps)
 {
     using pixel_t = rgb_t<T>;
-    T step1 = static_cast<T>(scalar_traits_t<T>::cube_size() / (steps - 1));
+    T step1 = static_cast<T>(scalar_traits_t<T>::one() / (steps - 1));
     pixel_t delta = { step1, step1, step1 };
     size_t steps1[] = { steps, steps, steps };
     function_t<pixel_t, pixel_t> seed(new identity_t<pixel_t>);

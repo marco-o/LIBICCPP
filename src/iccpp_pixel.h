@@ -12,17 +12,6 @@
 namespace iccpp
 {
 
-    template <class X, class Y, bool>
-    struct scaling_unit
-    {
-        enum {value = 1};
-    };
-
-    template <class X, class Y>
-    struct scaling_unit<X, Y, false>
-    {
-        enum { value = 256 };
-    };
     // some metaprogramming stuff
     template <class T, int N>
     struct arithmetic_t

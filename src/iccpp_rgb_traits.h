@@ -56,7 +56,7 @@ namespace iccpp
             //     deltas->offset = size1[0] - 1;
             deltas->offset -= deltas->offset / size1[0];
             // deltas->value = x - deltas->offset * step;
-            deltas->value = x * scalar_traits_t<T>::cube_size() / step - deltas->offset * scalar_traits_t<T>::cube_size();
+            deltas->value = x * scalar_traits_t<T>::one() / step - deltas->offset * scalar_traits_t<T>::one();
         }
 
     };

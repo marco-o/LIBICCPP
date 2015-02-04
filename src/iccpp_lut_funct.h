@@ -41,7 +41,7 @@ namespace iccpp
     function_t<Y, X> make_lut(const function_t<Y, X> &f, size_t steps)
     {
         using scalar_type = typename X::scalar_type;
-        X dx(static_cast<scalar_type>(scalar_traits_t<scalar_type>::cube_size() / (steps - 1)));
+        X dx(static_cast<scalar_type>(scalar_traits_t<scalar_type>::one() / (steps - 1)));
         size_t gridsteps[X::dimension];
 
         for (size_t i = 0; i < X::dimension; i++)

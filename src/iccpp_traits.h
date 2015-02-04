@@ -20,7 +20,6 @@ namespace iccpp
         typedef T scalar_type;
         typedef T weight_type;
         static T one(void) { return 1; }
-        static T cube_size(void) { return 1; }
     };
 
     template <>
@@ -28,8 +27,7 @@ namespace iccpp
     {
         typedef int weight_type;
         typedef unsigned char scalar_type;
-        static int          one(void) { return 256; }
-        static scalar_type  cube_size(void) { return 255; }
+        static int          one(void) { return 255; }
     };
 
     template <>
@@ -37,8 +35,21 @@ namespace iccpp
     {
         typedef int weight_type;
         typedef int scalar_type;
-        static int          one(void) { return 256; }
-        static scalar_type  cube_size(void) { return 255; }
+        static int          one(void) { return 255; }
+    };
+
+    // if X is smaller (false) then there is a down scaling
+    template <class X, class Y, bool>
+    struct scaling_unit
+    {
+        enum { value = 1 };
+    };
+
+    template <class X, class Y>
+    struct scaling_unit<X, Y, false>
+    {
+        // should be scalar_traits_t<X>::one, but cannot use a function to init an enum...
+        enum { value = 255 };
     };
 
 }
