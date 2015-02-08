@@ -276,8 +276,8 @@ namespace iccpp
     public:
         enum {dimension = X::dimension};
         using input_traits_t = lut_input_traits_t<X>;
-        typedef typename input_traits_t::scalar_type scalar_type;
-        typedef typename input_traits_t::weight_type weight_type;
+        using scalar_type = typename input_traits_t::scalar_type;
+        using weight_type = typename input_traits_t::weight_type;
         lut_t(const size_t *size, const X &step) : data_(size), step_(step) {}
         // that's a bit silly but effective to fill in the data
         size_t datasize(void) const { return data_.datasize(); }

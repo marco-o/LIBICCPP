@@ -124,6 +124,8 @@ namespace iccpp
         public:
             composite_t(algo_t<Y, X> *lhs,
                         algo_t<X, Z> *rhs) : lhs_(lhs), rhs_(rhs) {}
+            composite_t(std::shared_ptr<algo_t<Y, X>> lhs,
+                        std::shared_ptr<algo_t<X, Z>> rhs) : lhs_(lhs), rhs_(rhs) {}
             ///
             /// @brief Evaluation of functional composition
             ///
@@ -134,26 +136,21 @@ namespace iccpp
             }
             virtual composite_t<Z> *clone(void) const override
             {
-                return new composite_t<Z>(lhs_->clone(), rhs_->clone());
+                return new composite_t<Z>(lhs_, rhs_);
             }
         private:
-            std::unique_ptr<algo_t<Y, X>> lhs_;
-            std::unique_ptr<algo_t<X, Z>> rhs_;
+            std::shared_ptr<algo_t<Y, X>> lhs_;
+            std::shared_ptr<algo_t<X, Z>> rhs_;
         };
         ///
         /// @brief Construction from an algorithm
         ///
         function_t(algo_t<Y, X> *algo) : imp_(algo) {}
-        ///
-        /// @brief Copy construction. Clones the algorithm
-        ///
-        function_t(const function_t<Y, X> &rhs) : imp_(rhs.clone()) {}
         operator bool() { return imp_.get() != nullptr; }
         //
         // Something to rearrange better...
         //
         algo_t<Y, X> *get(void)     { return imp_.get(); }
-        algo_t<Y, X> *release(void) { return imp_.release(); }
         //
         // Operations
         //
@@ -169,13 +166,17 @@ namespace iccpp
         { 
             return imp_->clone(); 
         }
+        std::shared_ptr<algo_t<Y, X>> imp(void) const
+        {
+            return imp_;
+        }
         template <class Z>
         function_t<Y, Z> operator*(const function_t<X, Z> &rhs) const ///< Function composition operation
         {
-            return function_t<Y, Z>(new composite_t<Z>(imp_->clone(), rhs.clone()));
+            return function_t<Y, Z>(new composite_t<Z>(imp_, rhs.imp()));
         }
     private:
-        std::unique_ptr<algo_t<Y, X>> imp_;
+        mutable std::shared_ptr<algo_t<Y, X>> imp_;
     };
     // probably the simplest possible algorithm...
     template <class X>

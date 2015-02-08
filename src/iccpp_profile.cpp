@@ -635,7 +635,7 @@ namespace iccpp
                 function_vect_t<Outputs, Outputs> output(build_curve_m<Outputs>(reader, output_entries));
                 function_vect_t<Inputs, Inputs>  f1 = cond_prod_t<Inputs, Inputs>::exec(input, matrix);
                 function_vect_t<Outputs, Inputs> f2 = (output *(clut * f1));
-                return tag_content_ptr_t(adapt_algo_domain<Outputs, Inputs>(f2.release(), header_.color_space, header_.pcs));
+                return tag_content_ptr_t(adapt_algo_domain<Outputs, Inputs>(f2.get(), header_.color_space, header_.pcs));
             }
             //
             // A to B reading stuff
@@ -665,7 +665,7 @@ namespace iccpp
                 function_vect_t<Outputs, Inputs> f3 = bcurve * f2;
 
                 // nice, here we have an object and we know its type, but we must throw everything...
-                return tag_content_ptr_t(adapt_algo_domain<Outputs, Inputs>(f3.release(), header_.pcs, header_.color_space));
+                return tag_content_ptr_t(adapt_algo_domain<Outputs, Inputs>(f3.get(), header_.pcs, header_.color_space));
             }
             //
             // B to A reading stuff

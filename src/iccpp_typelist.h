@@ -22,6 +22,21 @@ namespace iccpp
         typedef V tail;
     };
 
+    template <class ... Args>
+    struct type_builder_t;
+
+    template <class U, class ... Args>
+    struct type_builder_t<U, Args ...>
+    {
+        using type = type_list_t<U, typename type_builder_t<Args...>::type>;
+    };
+
+    template <class U>
+    struct type_builder_t<U>
+    {
+        using type = type_list_t<U, type_list_end_t>;
+    };
+
     template <class X, class K>
     struct visitor_domain_chain_t {};
 
@@ -68,9 +83,9 @@ namespace iccpp
         typedef K type;
     };
 
-    typedef type_list_t < xyz_t,
-            type_list_t < lab_t,
-            type_list_t<rgb_t<double>, type_list_end_t >> > color_space_list_t;
+    typedef type_builder_t < xyz_t, 
+                             lab_t, 
+                             rgb_t<double>>::type  color_space_list_t;
 
 
 }
