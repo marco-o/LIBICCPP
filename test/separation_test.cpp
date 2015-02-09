@@ -33,25 +33,25 @@ BOOST_AUTO_TEST_CASE(color_conv_adapter)
 {
 	function_t<rgb_t<double>, xyz_t> f1(new xyz2rgb_t);
 
-    std::unique_ptr<algo_base_t> algo(adapt_domain<lab_t>(f1.get()));
+    std::shared_ptr<algo_base_t> algo(adapt_domain<lab_t>(f1.get()));
     BOOST_CHECK(algo.get() != nullptr);
     //std::cout << "Result = " << typeid(*algo).name() << std::endl;
 
-    std::unique_ptr<algo_base_t> algo1(adapt_range<rgb_t<unsigned char >>(algo.get()));
+    std::shared_ptr<algo_base_t> algo1(adapt_range<rgb_t<unsigned char >>(algo));
     BOOST_CHECK(algo1.get() != nullptr);
     //std::cout << "Result = " << typeid(*algo1).name() << std::endl;
 
-    std::unique_ptr<algo_base_t> algo2(adapt_range<rgb_t<double>>(algo.get()));
+    std::shared_ptr<algo_base_t> algo2(adapt_range<rgb_t<double>>(algo));
     BOOST_CHECK(algo2.get() != nullptr);
     //std::cout << "Result = " << typeid(*algo2).name() << std::endl;
 
-    std::unique_ptr<algo_base_t> algo3(adapt_domain2<rgb_t<unsigned char >, lab_t>(algo1.get()));
+    std::shared_ptr<algo_base_t> algo3(adapt_domain2<rgb_t<unsigned char >, lab_t>(algo1));
     BOOST_CHECK(algo3.get() != nullptr);
     //std::cout << "Result = " << typeid(*algo3).name() << std::endl;
 
-    std::unique_ptr<algo_base_t> algo4(adapt_domain<rgb_t<float>>(f1.get()));
+    std::shared_ptr<algo_base_t> algo4(adapt_domain<rgb_t<float>>(f1.get()));
     BOOST_CHECK(algo4.get() != nullptr);
-    std::unique_ptr<algo_base_t> algo5(adapt_range2<rgb_t<unsigned char >, rgb_t<float>>(algo4.get()));
+    std::shared_ptr<algo_base_t> algo5(adapt_range2<rgb_t<unsigned char >, rgb_t<float>>(algo4));
     BOOST_CHECK(algo5.get() != nullptr);
 }
 

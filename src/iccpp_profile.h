@@ -64,40 +64,38 @@ namespace iccpp
         virtual void load_all(void) {}
         virtual void load_tag(tag_signature_t) {}
         template <class Y, class X>
-        static function_t<Y, X> extract_casted(algo_base_t *algo)
+        static function_t<Y, X> extract_casted(std::shared_ptr<algo_base_t> algo)
         {
-            algo_t<Y, X> *result = dynamic_cast<algo_t<Y, X> *>(algo);
-            if (!result) // non null pointers will be taken over by the called
-                delete algo;
+            std::shared_ptr<algo_t<Y, X>> result = std::dynamic_pointer_cast<algo_t<Y, X>>(algo);
             return function_t<Y, X>(result);
         }
         template <class Y, class X>
         function_t<Y, X> pcs2device(rendering_intent_t intent = rendering_intent_t::relative_colorimetric)
         {
-            algo_base_t *algo = pcs2dev(intent);
+            std::shared_ptr<algo_base_t> algo = pcs2dev(intent);
             if (algo)
             {
-                std::unique_ptr<algo_base_t> domain_adapted(adapt_domain<X>(algo)); // domain is known
+                std::shared_ptr<algo_base_t> domain_adapted(adapt_domain<X>(algo)); // domain is known
                 if (domain_adapted)
-                    return extract_casted<Y, X>(adapt_range2<Y, X>(domain_adapted.get()));
+                    return extract_casted<Y, X>(adapt_range2<Y, X>(domain_adapted));
             }
-            return function_t<Y, X>(dynamic_cast<algo_t<Y, X> *>(algo));
+            return function_t<Y, X>(std::dynamic_pointer_cast<algo_t<Y, X>>(algo));
         }
         template <class Y, class X>
         function_t<Y, X> device2pcs(rendering_intent_t intent = rendering_intent_t::relative_colorimetric)
         {
-            algo_base_t *algo = dev2pcs(intent);
+            std::shared_ptr<algo_base_t> algo = dev2pcs(intent);
             if (algo)
             {
-                std::unique_ptr<algo_base_t> range_adapted(adapt_range<Y>(algo)); // domain is handled, since is a fairly standard space
+                std::shared_ptr<algo_base_t> range_adapted(adapt_range<Y>(algo)); // domain is handled, since is a fairly standard space
                 if (range_adapted)
-                    return extract_casted<Y, X>(adapt_domain2<Y, X>(range_adapted.get()));
+                    return extract_casted<Y, X>(adapt_domain2<Y, X>(range_adapted));
             }
-            return function_t<Y, X>(dynamic_cast<algo_t<Y, X> *>(algo));
+            return function_t<Y, X>(std::dynamic_pointer_cast<algo_t<Y, X>>(algo));
         }
     protected:
-        virtual algo_base_t *dev2pcs(rendering_intent_t) = 0; ///< helps building PCS to device transform
-        virtual algo_base_t *pcs2dev(rendering_intent_t) = 0;
+        virtual std::shared_ptr<algo_base_t> dev2pcs(rendering_intent_t) = 0; ///< helps building PCS to device transform
+        virtual std::shared_ptr<algo_base_t> pcs2dev(rendering_intent_t) = 0;
     private:
     };
 }

@@ -85,7 +85,8 @@ namespace iccpp
 
     typedef type_builder_t < xyz_t, 
                              lab_t, 
-                             rgb_t<double>>::type  color_space_list_t;
+                             rgb_t<double>,
+                             vector_t<double, 4>>::type  color_space_list_t;
 
 
 }

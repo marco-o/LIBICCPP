@@ -146,11 +146,12 @@ namespace iccpp
         /// @brief Construction from an algorithm
         ///
         function_t(algo_t<Y, X> *algo) : imp_(algo) {}
+        function_t(std::shared_ptr<algo_t<Y, X>> algo) : imp_(algo) {}
         operator bool() { return imp_.get() != nullptr; }
         //
         // Something to rearrange better...
         //
-        algo_t<Y, X> *get(void)     { return imp_.get(); }
+        std::shared_ptr<algo_base_t> get(void)     { return std::dynamic_pointer_cast<algo_base_t>(imp_); }
         //
         // Operations
         //

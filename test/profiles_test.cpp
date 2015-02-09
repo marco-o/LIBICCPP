@@ -70,3 +70,15 @@ BOOST_AUTO_TEST_CASE(icc_srgb)
     double err = res.red * res.red + res.green * res.green + res.blue * res.blue;
     BOOST_CHECK(err<1e-6);
 }
+
+
+BOOST_AUTO_TEST_CASE(icc_cmyk)
+{
+    using cmyk_t = vector_t<double, 4>;
+    std::unique_ptr<profile_t> handler(profile_t::create("cmyk.icc"));
+    BOOST_CHECK(handler);
+    if (!handler)
+        return;
+    function_t<lab_t, cmyk_t> f = handler->device2pcs<lab_t, cmyk_t>();
+    BOOST_CHECK(f);
+}

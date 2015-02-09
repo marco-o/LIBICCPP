@@ -261,13 +261,13 @@ namespace iccpp
         class tag_algo_t : public tag_content_base_t
         {
         public:
-            tag_algo_t(algo_base_t *algo) : algo_(algo) {}
-            algo_base_t *algo(void) { return algo_.get(); }
+            tag_algo_t(std::shared_ptr<algo_base_t> algo) : algo_(algo) {}
+            std::shared_ptr<algo_base_t> algo(void) { return algo_; }
         private:
-            std::unique_ptr<algo_base_t> algo_;
+            std::shared_ptr<algo_base_t> algo_;
         };
 
-        tag_content_base_t *make_algo_content(algo_base_t *algo)
+        tag_content_base_t *make_algo_content(std::shared_ptr<algo_base_t> algo)
         {
             return new tag_algo_t(algo);
         }
@@ -302,18 +302,18 @@ namespace iccpp
         };
 
         template <int Outputs, class D>
-        tag_content_base_t *adapt_algo_range(algo_base_t *algo, color_space_t output)
+        tag_content_base_t *adapt_algo_range(std::shared_ptr<algo_base_t> algo, color_space_t output)
         {
             switch (output)
             {
             case color_space_t::XYZData:
-                algo = range_t<xyz_t, 3, D>::type(algo);
+                algo.reset(range_t<xyz_t, 3, D>::type(algo.get()));
                 break;
             case color_space_t::LabData:
-                algo = range_t<lab_t, 3, D>::type(algo);
+                algo.reset(range_t<lab_t, 3, D>::type(algo.get()));
                 break;
             case color_space_t::RgbData:
-                algo = range_t<rgb_t<double>, 3, D>::type(algo);
+                algo.reset(range_t<rgb_t<double>, 3, D>::type(algo.get()));
                 break;
             default:
                 break ;
@@ -322,17 +322,17 @@ namespace iccpp
         }
 
         template <int Outputs, int Inputs>
-        tag_content_base_t *adapt_algo_domain(algo_base_t *algo, color_space_t output, color_space_t input)
+        tag_content_base_t *adapt_algo_domain(std::shared_ptr<algo_base_t> algo, color_space_t output, color_space_t input)
         {
-            std::unique_ptr<algo_base_t> domain_adapted;
+            std::shared_ptr<algo_base_t> domain_adapted;
             switch (input)
             {
             case color_space_t::XYZData:
-                domain_adapted.reset(domain_t<Outputs, 3, xyz_t>::type(algo));
-                return adapt_algo_range<Outputs, xyz_t>(domain_adapted.get(), output);
+                domain_adapted.reset(domain_t<Outputs, 3, xyz_t>::type(algo.get()));
+                return adapt_algo_range<Outputs, xyz_t>(domain_adapted, output);
             case color_space_t::LabData:
-                domain_adapted.reset(domain_t<Outputs, 3, lab_t>::type(algo));
-                return adapt_algo_range<Outputs, lab_t>(domain_adapted.get(), output);
+                domain_adapted.reset(domain_t<Outputs, 3, lab_t>::type(algo.get()));
+                return adapt_algo_range<Outputs, lab_t>(domain_adapted, output);
             default:
                 return make_algo_content(algo);
             }
@@ -481,7 +481,7 @@ namespace iccpp
                 }
             }
         private:
-            virtual algo_base_t *dev2pcs(rendering_intent_t intent) override
+            virtual std::shared_ptr<algo_base_t> dev2pcs(rendering_intent_t intent) override
             { // 'A' is device side, 'B' is PCS
                 static const tag_signature_t sc_dev2pcs[] = { tag_signature_t::AToB0Tag,     // Perceptual
                                                               tag_signature_t::AToB1Tag,     // Relative colorimetric
@@ -495,7 +495,7 @@ namespace iccpp
 
                 return get_tag(get_preferred_tag(intent, sc_dev2pcsfl, sc_dev2pcs));
             }
-            virtual algo_base_t *pcs2dev(rendering_intent_t intent) override
+            virtual std::shared_ptr<algo_base_t> pcs2dev(rendering_intent_t intent) override
             {  // 'A' is device side, 'B' is PCS
                 static const tag_signature_t sc_pcs2dev[] = { tag_signature_t::BToA0Tag,     // Perceptual
                                                               tag_signature_t::BToA1Tag,     // Relative colorimetric
@@ -523,7 +523,7 @@ namespace iccpp
                     signature = tags[0]; // default is perceptual
                 return signature;
             }
-            algo_base_t *get_tag(tag_signature_t signature)
+            std::shared_ptr<algo_base_t> get_tag(tag_signature_t signature)
             {
                 tag_content_ptr_t result = load_tag_imp(signature);
                 tag_algo_t *tag_algo = dynamic_cast<tag_algo_t *>(result.get());
@@ -873,21 +873,21 @@ namespace iccpp
             virtual color_space_t pcs(void) const { return color_space_t::XYZData; }
             virtual color_space_t device(void) const { return color_space_t::RgbData; }
         protected:
-            virtual algo_base_t *dev2pcs(rendering_intent_t)
+            virtual std::shared_ptr<algo_base_t> dev2pcs(rendering_intent_t) override
             {
                 if (!rgb2xyz_)
                     rgb2xyz_.reset(new color_conversion_t<xyz_t, rgb_t<double>>);
-                return rgb2xyz_.get();
+                return rgb2xyz_;
             }
-            virtual algo_base_t *pcs2dev(rendering_intent_t)
+            virtual std::shared_ptr<algo_base_t> pcs2dev(rendering_intent_t) override 
             {
                 if (!xyz2rgb_)
                     xyz2rgb_.reset(new color_conversion_t<rgb_t<double>, xyz_t>);
-                return xyz2rgb_.get();
+                return xyz2rgb_;
             }
         private:
-            std::unique_ptr<algo_t<xyz_t, rgb_t<double>>>   rgb2xyz_;
-            std::unique_ptr<algo_t<rgb_t<double>, xyz_t>>   xyz2rgb_;
+            std::shared_ptr<algo_t<xyz_t, rgb_t<double>>>   rgb2xyz_;
+            std::shared_ptr<algo_t<rgb_t<double>, xyz_t>>   xyz2rgb_;
         };
     } // namespace loader
 
