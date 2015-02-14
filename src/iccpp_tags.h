@@ -159,6 +159,7 @@ namespace iccpp
     // ICC Color spaces
     enum class color_space_t
     {
+        None                              = 0,
         XYZData                           = 0x58595A20,  // 'XYZ '
         LabData                           = 0x4C616220,  // 'Lab '
         LuvData                           = 0x4C757620,  // 'Luv '

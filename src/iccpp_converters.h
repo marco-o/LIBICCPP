@@ -107,7 +107,6 @@ namespace iccpp
     class visitor_domain_first_kernel_t : virtual public visitor_base_t
     {
     public:
-        visitor_domain_first_kernel_t(void) : result_(0) {}
         std::shared_ptr<algo_base_t> result(void) { return result_; }
         template <class D>
         void domain(algo_domain_t<D> &algo)

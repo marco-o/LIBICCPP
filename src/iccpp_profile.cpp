@@ -52,6 +52,7 @@ namespace iccpp
             }
         };
     }
+
     namespace loader
     {
         struct tag_entry_t
@@ -64,17 +65,23 @@ namespace iccpp
         class reader_t
         {
         public:
-            reader_t(std::istream &ist, size_t offset = 0) : ist_(ist), offset_(offset), dsize_(1)
+            reader_t(std::istream &ist, 
+                     color_space_t out = color_space_t::None, 
+                     color_space_t in = color_space_t::None, 
+                     size_t offset = 0) :
+                           ist_(ist), out_(out), in_(in), offset_(offset), dsize_(1)
             {
                 if (offset != 0)
                     ist.seekg(offset);
             }
             reader_t &operator=(const reader_t &) = delete;
+            color_space_t in(void) const { return in_; }
+            color_space_t out(void) const { return out_; }
             void   entry_size(size_t value) { dsize_ = value; }
             size_t entry_size(void) const { return dsize_; }
             reader_t operator + (int offset)
             {
-                return reader_t(ist_, offset_ + offset);
+                return reader_t(ist_, out_, in_, offset_ + offset);
             }
             size_t offset(void) const { return offset_; }
             template <class T>
@@ -181,6 +188,8 @@ namespace iccpp
                 return result;
             }
             std::istream &ist_;
+            color_space_t out_;
+            color_space_t in_;
             size_t        offset_;
             size_t        dsize_; // normalized way of reading 
         };
@@ -280,10 +289,10 @@ namespace iccpp
             {
                 algo_type_t *algo = dynamic_cast<algo_type_t *>(algob);
                 if (algo)
-                    algob = domain_converter_t<vector_t<double, Outputs>,
-                                                vector_t<double, Inputs>,
-          D>::adapt(reinterpret_cast<typename color_conversion_t<vector_t<double, Inputs>, D>::domain_t *>(0), algo);
-                return algob;
+                    return domain_converter_t<vector_t<double, Outputs>,
+                                              vector_t<double, Inputs>,
+                       D>::adapt(reinterpret_cast<typename color_conversion_t<vector_t<double, Inputs>, D>::domain_t *>(0), algo);
+                return nullptr;
             }
         };
 
@@ -295,9 +304,9 @@ namespace iccpp
             {
                 algo_type_t *algo = dynamic_cast<algo_type_t *>(algob);
                 if (algo)
-                    algob = range_converter_t<R, vector_t<double, Outputs>, D>::adapt(
-                    reinterpret_cast<typename color_conversion_t<R, vector_t<double, Outputs>>::domain_t *>(0), algo);
-                return algob;
+                    return range_converter_t<R, vector_t<double, Outputs>, D>::adapt(
+                           reinterpret_cast<typename color_conversion_t<R, vector_t<double, Outputs>>::domain_t *>(0), algo);
+                return nullptr;
             }
         };
 
@@ -321,6 +330,48 @@ namespace iccpp
             return make_algo_content(algo);
         }
 
+        // this one may be useful also out of here...
+        template <class S, int N>
+        struct vect_typelist_t
+        {
+            using type = type_list_t < vector_t<S, N>, typename vect_typelist_t<S, N - 1>::type>;
+        };
+
+        template <class S>
+        struct vect_typelist_t<S, 0>
+        {
+            using type = type_list_end_t;
+        };
+
+//        using vect_tlist_t = vect_typelist_t <double, 15>::type ;
+        using vect_tlist_t = type_builder_t < vector_t<double, 4 >,
+                                              vector_t<double, 5>> ::type ;
+
+
+        template <int Outputs>
+        class visitor_domain_adapter_default_kernel_t : virtual public visitor_base_t
+        {
+        public:
+            void init(std::shared_ptr<algo_base_t> algo, color_space_t output) 
+            {
+                algo_ = algo;
+                output_ = output; 
+            }
+            tag_content_base_t *result(void) { return result_; }
+            template <class D>
+            void domain(algo_domain_t<D> &)
+            {
+                result_ = adapt_algo_range<Outputs, D>(algo_, output_);
+            }
+        private:
+            tag_content_base_t *result_;
+            std::shared_ptr<algo_base_t> algo_;
+            color_space_t output_;
+        };
+        template <int Outputs>
+        using visitor_domain_adapter_tl_t = visitor_domain_chain_t<vect_tlist_t, visitor_domain_adapter_default_kernel_t<Outputs>>;
+
+
         template <int Outputs, int Inputs>
         tag_content_base_t *adapt_algo_domain(std::shared_ptr<algo_base_t> algo, color_space_t output, color_space_t input)
         {
@@ -334,7 +385,43 @@ namespace iccpp
                 domain_adapted.reset(domain_t<Outputs, 3, lab_t>::type(algo.get()));
                 return adapt_algo_range<Outputs, lab_t>(domain_adapted, output);
             default:
-                return make_algo_content(algo);
+                {
+                       visitor_domain_adapter_tl_t<Outputs>::type visitor ;
+                       visitor.init(algo, output);
+                       algo->accept_domain(visitor);
+                       return visitor.result();
+                }
+                break ;
+#if 0
+            case color_space_t::YCbCrData:
+            case color_space_t::YxyData:
+            case color_space_t::HsvData:
+            case color_space_t::HlsData:
+            case color_space_t::MCH3Data:
+            case color_space_t::colorData3: // keep domain as is
+                return adapt_algo_range<Outputs, vector_t<double, 3>>(algo, output);
+            case color_space_t::MCH4Data:
+            case color_space_t::colorData4:
+            case color_space_t::LuvKData:
+            case color_space_t::CmykData: // keep domain as is
+                return adapt_algo_range<Outputs, vector_t<double, 4>>(algo, output);
+                // for th time being this partial listing is OK but I defnitely
+                // aim to something more compact, or at least I want this list out of here
+            case color_space_t::MCH5Data:
+            case color_space_t::colorData5:
+                return adapt_algo_range<Outputs, vector_t<double, 5>>(algo, output);
+            case color_space_t::MCH6Data:
+            case color_space_t::colorData6:
+                return adapt_algo_range<Outputs, vector_t<double, 6>>(algo, output);
+            case color_space_t::MCH7Data:
+            case color_space_t::colorData7:
+                return adapt_algo_range<Outputs, vector_t<double, 7>>(algo, output);
+            case color_space_t::MCH8Data:
+            case color_space_t::colorData8:
+                return adapt_algo_range<Outputs, vector_t<double, 8>>(algo, output);
+            default: // 
+                throw icc_file_exception_t("Unsupported input space");
+#endif
             }
         }
 
@@ -468,6 +555,7 @@ namespace iccpp
                     ost << signature << " -> " << std::string(type, 4) << "\n";
                 }
             }
+            /*
             virtual void load_tag(tag_signature_t signature) override
             {
                 load_tag_imp(signature);
@@ -480,6 +568,7 @@ namespace iccpp
                     load_tag(reader, tag.signature);
                 }
             }
+            */
         private:
             virtual std::shared_ptr<algo_base_t> dev2pcs(rendering_intent_t intent) override
             { // 'A' is device side, 'B' is PCS
@@ -493,7 +582,7 @@ namespace iccpp
                                                                 tag_signature_t::DToB2Tag,     // Saturation
                                                                 tag_signature_t::DToB3Tag };   // Absolute colorimetric
 
-                return get_tag(get_preferred_tag(intent, sc_dev2pcsfl, sc_dev2pcs));
+                return get_tag(get_preferred_tag(intent, sc_dev2pcsfl, sc_dev2pcs), false);
             }
             virtual std::shared_ptr<algo_base_t> pcs2dev(rendering_intent_t intent) override
             {  // 'A' is device side, 'B' is PCS
@@ -507,7 +596,7 @@ namespace iccpp
                                                                 tag_signature_t::BToD2Tag,     // Saturation
                                                                 tag_signature_t::BToD3Tag };   // Absolute colorimetric
 
-                return get_tag(get_preferred_tag(intent, sc_pcs2devfl, sc_pcs2dev));
+                return get_tag(get_preferred_tag(intent, sc_pcs2devfl, sc_pcs2dev), true);
             }
             tag_signature_t get_preferred_tag(rendering_intent_t intent,
                                               const tag_signature_t *fltags,
@@ -523,21 +612,23 @@ namespace iccpp
                     signature = tags[0]; // default is perceptual
                 return signature;
             }
-            std::shared_ptr<algo_base_t> get_tag(tag_signature_t signature)
+            std::shared_ptr<algo_base_t> get_tag(tag_signature_t signature, bool pcs2dev)
             {
-                tag_content_ptr_t result = load_tag_imp(signature);
+                tag_content_ptr_t result = load_tag_imp(signature, pcs2dev);
                 tag_algo_t *tag_algo = dynamic_cast<tag_algo_t *>(result.get());
                 if (tag_algo != nullptr)
                     return tag_algo->algo();
                 else
                     return nullptr;
             }
-            tag_content_ptr_t load_tag_imp(tag_signature_t signature)
+            tag_content_ptr_t load_tag_imp(tag_signature_t signature, bool pcs2dev)
             {
                 for (const tag_entry_t &tag : tags_)
                     if (tag.signature == signature)
                     {
-                        reader_t reader(*stream_, tag.offset);
+                        color_space_t in = pcs2dev ? header_.pcs : header_.color_space;
+                        color_space_t out = pcs2dev ? header_.color_space : header_.pcs;
+                        reader_t reader(*stream_, out, in, tag.offset);
                         return load_tag(reader, signature);
                     }
                 return tag_content_ptr_t();
@@ -614,7 +705,7 @@ namespace iccpp
                 return result;
             }
             */
-            template <int Outputs, int Inputs>
+            template <int Inputs, int Outputs>
             tag_content_ptr_t lut_loaderIO(Lut_816_t, reader_t reader)
             {
                 tag_content_ptr_t result;
@@ -635,7 +726,7 @@ namespace iccpp
                 function_vect_t<Outputs, Outputs> output(build_curve_m<Outputs>(reader, output_entries));
                 function_vect_t<Inputs, Inputs>  f1 = cond_prod_t<Inputs, Inputs>::exec(input, matrix);
                 function_vect_t<Outputs, Inputs> f2 = (output *(clut * f1));
-                return tag_content_ptr_t(adapt_algo_domain<Outputs, Inputs>(f2.get(), header_.color_space, header_.pcs));
+                return tag_content_ptr_t(adapt_algo_domain<Outputs, Inputs>(f2.get(), reader.out(), reader.in()));
             }
             //
             // A to B reading stuff

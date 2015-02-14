@@ -21,6 +21,18 @@
 #endif
 using namespace iccpp;
 
+#if 0
+// that's atest case used mainly for early development
+std::unique_ptr<profile_t> handler(profile_t::create("profile.icc"));
+std::unique_ptr<profile_t> handler1(profile_t::create_sRGB());
+BOOST_CHECK(handler);
+if (!handler)
+return;
+handler->list_tags(std::cout);
+handler->load_tag(tag_signature_t::BToA1Tag);
+//	handler->load_all();
+#endif
+
 BOOST_AUTO_TEST_CASE(icc_loader)
 {
 	std::unique_ptr<profile_t> handler(profile_t::create("profile.icc"));
@@ -28,12 +40,8 @@ BOOST_AUTO_TEST_CASE(icc_loader)
 	BOOST_CHECK(handler);
     if (!handler)
         return ;
-	handler->list_tags(std::cout);
-	handler->load_tag(tag_signature_t::BToA1Tag);
-//	handler->load_all();
 
     lab_t lab;
-
     // to make this case work one needs to add proper type at the end of the chain...
     rgb_t<double> x = { 0.3764, 0.5019, 0.5647 };
     function_t<rgb_t<double>, lab_t> f = handler->pcs2device<rgb_t<double>, lab_t>();
@@ -49,6 +57,8 @@ BOOST_AUTO_TEST_CASE(icc_loader)
     rgb_t<unsigned char> xc = { 30, 60, 90 };
     function_t<rgb_t<unsigned char>, lab_t> fc = handler->pcs2device<rgb_t<unsigned char>, lab_t>();
     function_t<lab_t, rgb_t<unsigned char>> gc = handler1->device2pcs<lab_t, rgb_t<unsigned char>>();
+    BOOST_CHECK(fc);
+    BOOST_CHECK(gc);
     lab = gc(xc);
     rgb_t<unsigned char> yc = fc(lab);
     (void)yc; 
@@ -81,4 +91,19 @@ BOOST_AUTO_TEST_CASE(icc_cmyk)
         return;
     function_t<lab_t, cmyk_t> f = handler->device2pcs<lab_t, cmyk_t>();
     BOOST_CHECK(f);
+    function_t<xyz_t, cmyk_t> h = handler->device2pcs<xyz_t, cmyk_t>();
+    BOOST_CHECK(h);
+    function_t<cmyk_t, lab_t> g = handler->pcs2device<cmyk_t, lab_t>();
+    BOOST_CHECK(g);
+    function_t<cmyk_t, xyz_t> l = handler->pcs2device<cmyk_t, xyz_t>();
+    BOOST_CHECK(l);
+    // this one shoud fail t load silently, so is OK that result is nullptr
+    function_t<cmyk_t, rgb_t<double>> s = handler->pcs2device<cmyk_t, rgb_t<double>>();
+    BOOST_CHECK(s.get() == nullptr);
+
+    using cmyku_t = vector_t<unsigned char, 4>;
+    function_t<lab_t, cmyku_t> fu = handler->device2pcs<lab_t, cmyku_t>();
+    BOOST_CHECK(fu);
+    function_t<cmyku_t, lab_t> gu = handler->pcs2device<cmyku_t, lab_t>();
+    BOOST_CHECK(gu);
 }

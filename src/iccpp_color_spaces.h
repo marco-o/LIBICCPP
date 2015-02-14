@@ -423,6 +423,24 @@ namespace iccpp
         }
     };
 
+
+    template <class S, class T, int N>
+    class color_conversion_t<vector_t<S, N>, vector_t<T, N>> : public algo_t<vector_t<S, N>, vector_t<T, N>>
+    {
+    public:
+        typedef vector_t<T, N> domain_t;
+        virtual vector_t<S, N> eval(const vector_t<T, N> &v) const override
+        {
+            vector_t<S, N> result;
+            arithmetic_t<S, N>::assign_scaled(result.data(), v.data());
+            return result;
+        }
+        virtual color_conversion_t<vector_t<S, N>, vector_t<T, N>> *clone(void) const override
+        {
+            return new color_conversion_t<vector_t<S, N>, vector_t<T, N>>;
+        }
+    };
+
 } // namespace iccpp
 
 #endif
